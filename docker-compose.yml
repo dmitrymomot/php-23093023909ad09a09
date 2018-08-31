@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+
+  nginx:
+    image: nginx:1.15
+    ports:
+      - '8000:80'
+    depends_on:
+      - php
+    volumes:
+     - .:/var/www/
+     - ./docker/nginx/local.conf:/etc/nginx/conf.d/default.conf
+
+  php:
+    build: ./docker/php
+    volumes:
+      - .:/var/www/
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/php.ini:ro
+      - ./docker/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ~/.composer-docker:/root/.composer
+      - ~/.bash_history:/root/.bash_history
+    depends_on:
+      - mailcatcher
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - '1080:1080'
