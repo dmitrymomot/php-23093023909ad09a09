@@ -8,13 +8,13 @@
         <table class="table table-bordered table-striped table-hover">
             <thead>
                 <tr>
-                    <th>S.No</th><th> First Name </th><th> Last Name </th><th> Quality Score </th><th>Actions</th>
+                    <th>ID</th><th> First Name </th><th> Last Name </th><th> Quality Score </th><th>Actions</th>
                 </tr>
             </thead>
             <tbody>
             @foreach($cleaner as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $item->id }}</td>
                     <td>{{ $item->first_name }}</td><td>{{ $item->last_name }}</td><td>{{ $item->quality_score }}</td>
                     <td>
                         <a href="{{ url('/cleaner/' . $item->id) }}" class="btn btn-success btn-xs" title="View Cleaner"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"/></a>

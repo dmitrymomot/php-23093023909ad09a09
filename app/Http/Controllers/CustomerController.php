@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Booking;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use App\Customer;
+use App\Http\Requests\CustomerStoreRequest;
+use App\Http\Requests\CustomerUpdateRequest;
+
 use Illuminate\Http\Request;
 use Session;
 
@@ -36,16 +41,13 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\CustomerStoreRequest $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function store(Request $request)
+    public function store(CustomerStoreRequest $request)
     {
-        
-        $requestData = $request->all();
-        
-        Customer::create($requestData);
+        Customer::create($request->validated());
 
         Session::flash('flash_message', 'Customer added!');
 
@@ -84,19 +86,16 @@ class CustomerController extends Controller
      * Update the specified resource in storage.
      *
      * @param  int  $id
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\CustomerUpdateRequest $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function update($id, Request $request)
+    public function update($id, CustomerUpdateRequest $request)
     {
-        
-        $requestData = $request->all();
-        
         $customer = Customer::findOrFail($id);
-        $customer->update($requestData);
-
-        Session::flash('flash_message', 'Customer updated!');
+        if ($customer->update($request->validated())) {
+            Session::flash('flash_message', 'Customer updated!');
+        }
 
         return redirect('customer');
     }
@@ -110,9 +109,10 @@ class CustomerController extends Controller
      */
     public function destroy($id)
     {
-        Customer::destroy($id);
-
-        Session::flash('flash_message', 'Customer deleted!');
+        if (Customer::destroy($id)) {
+            (new Booking)->where('customer_id', $id)->delete();
+            Session::flash('flash_message', 'Customer deleted!');
+        }
 
         return redirect('customer');
     }

@@ -8,7 +8,7 @@
 
     {!! Form::open(['url' => '/cleaner', 'class' => 'form-horizontal', 'files' => true]) !!}
 
-                    <div class="form-group {{ $errors->has('first_name') ? 'has-error' : ''}}">
+            <div class="form-group {{ $errors->has('first_name') ? 'has-error' : ''}}">
                 {!! Form::label('first_name', 'First Name', ['class' => 'col-sm-3 control-label']) !!}
                 <div class="col-sm-6">
                     {!! Form::text('first_name', null, ['class' => 'form-control']) !!}
@@ -27,6 +27,13 @@
                 <div class="col-sm-6">
                     {!! Form::number('quality_score', null, ['class' => 'form-control']) !!}
                     {!! $errors->first('quality_score', '<p class="help-block">:message</p>') !!}
+                </div>
+            </div>
+            <div class="form-group {{ $errors->has('cities') ? 'has-error' : ''}}">
+                {!! Form::label('cities', 'Cities', ['class' => 'col-sm-3 control-label']) !!}
+                <div class="col-sm-6">
+                    {!! Form::select('cities[]', $cities, null, ['multiple' => true, 'class' => 'form-control',  'size' => '10']) !!}
+                    {!! $errors->first('cities', '<p class="help-block">:message</p>') !!}
                 </div>
             </div>
 

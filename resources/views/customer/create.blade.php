@@ -8,7 +8,7 @@
 
     {!! Form::open(['url' => '/customer', 'class' => 'form-horizontal', 'files' => true]) !!}
 
-                    <div class="form-group {{ $errors->has('first_name') ? 'has-error' : ''}}">
+            <div class="form-group {{ $errors->has('first_name') ? 'has-error' : ''}}">
                 {!! Form::label('first_name', 'First Name', ['class' => 'col-sm-3 control-label']) !!}
                 <div class="col-sm-6">
                     {!! Form::text('first_name', null, ['class' => 'form-control']) !!}

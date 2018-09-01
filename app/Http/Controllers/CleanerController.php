@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\City;
+use App\Booking;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use App\Cleaner;
+use App\Http\Requests\CleanerStoreRequest;
+use App\Http\Requests\CleanerUpdateRequest;
+
 use Illuminate\Http\Request;
 use Session;
 
@@ -30,25 +36,27 @@ class CleanerController extends Controller
      */
     public function create()
     {
-        return view('cleaner.create');
+        $cities = (new City)->getList();
+        return view('cleaner.create', compact('cities'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\CleanerStoreRequest $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function store(Request $request)
+    public function store(CleanerStoreRequest $request)
     {
-        
-        $requestData = $request->all();
-        
-        Cleaner::create($requestData);
+        $cleaner = Cleaner::create($request->validated());
+        if ($cleaner) {
+            if (array_has($request->validated(), 'cities')) {
+                $cleaner->cities()->sync(array_get($request->validated(), 'cities'));
+            }
+        }
 
         Session::flash('flash_message', 'Cleaner added!');
-
         return redirect('cleaner');
     }
 
@@ -62,7 +70,6 @@ class CleanerController extends Controller
     public function show($id)
     {
         $cleaner = Cleaner::findOrFail($id);
-
         return view('cleaner.show', compact('cleaner'));
     }
 
@@ -75,28 +82,30 @@ class CleanerController extends Controller
      */
     public function edit($id)
     {
-        $cleaner = Cleaner::findOrFail($id);
+        $cleaner = Cleaner::with('cities')->find($id);
+        $cities = (new City)->getList();
 
-        return view('cleaner.edit', compact('cleaner'));
+        return view('cleaner.edit', compact('cleaner', 'cities'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  int  $id
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\CleanerUpdateRequest $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function update($id, Request $request)
+    public function update($id, CleanerUpdateRequest $request)
     {
-        
-        $requestData = $request->all();
-        
         $cleaner = Cleaner::findOrFail($id);
-        $cleaner->update($requestData);
+        if ($cleaner->update($request->validated())) {
+            if (array_has($request->validated(), 'cities')) {
+                $cleaner->cities()->sync(array_get($request->validated(), 'cities'));
+            }
 
-        Session::flash('flash_message', 'Cleaner updated!');
+            Session::flash('flash_message', 'Cleaner updated!');
+        }
 
         return redirect('cleaner');
     }
@@ -110,9 +119,11 @@ class CleanerController extends Controller
      */
     public function destroy($id)
     {
-        Cleaner::destroy($id);
-
-        Session::flash('flash_message', 'Cleaner deleted!');
+        if (Cleaner::destroy($id)) {
+            (new Booking)->where('cleaner_id', $id)->delete();
+            (new Cleaner)->removeCityRelationsFor($id);
+            Session::flash('flash_message', 'Cleaner deleted!');
+        }
 
         return redirect('cleaner');
     }

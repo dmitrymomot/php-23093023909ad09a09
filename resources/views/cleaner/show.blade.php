@@ -24,7 +24,10 @@
                 <tr>
                     <th>ID</th><td>{{ $cleaner->id }}</td>
                 </tr>
-                <tr><th> First Name </th><td> {{ $cleaner->first_name }} </td></tr><tr><th> Last Name </th><td> {{ $cleaner->last_name }} </td></tr><tr><th> Quality Score </th><td> {{ $cleaner->quality_score }} </td></tr>
+                <tr><th> First Name </th><td> {{ $cleaner->first_name }} </td></tr>
+                <tr><th> Last Name </th><td> {{ $cleaner->last_name }} </td></tr>
+                <tr><th> Quality Score </th><td> {{ $cleaner->quality_score }} </td></tr>
+                <tr><th> Works in Citites </th><td> {!! $cleaner->getCitiesAsString() !!} </td></tr>
             </tbody>
         </table>
     </div>
