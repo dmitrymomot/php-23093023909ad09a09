@@ -24,7 +24,11 @@
                 <tr>
                     <th>ID</th><td>{{ $booking->id }}</td>
                 </tr>
-                <tr><th> Date </th><td> {{ $booking->date }} </td></tr><tr><th> Customer Id </th><td> {{ $booking->customer_id }} </td></tr><tr><th> Cleaner Id </th><td> {{ $booking->cleaner_id }} </td></tr>
+                <tr><th>Customer</th><td><a href="{{ route('customer.show', ['id' => $booking->customer->id]) }}">{{ $booking->customer->name() }}</a></td></tr>
+                <tr><th>Cleaner</th><td><a href="{{ route('customer.show', ['id' => $booking->cleaner->id])}}">{{ $booking->cleaner->name() }}</a></td></tr>
+                <tr><th>Date</th><td>{{ $booking->dateTime() }}</td></tr>
+                <tr><th>Duration</th><td>{{ $booking->cleaningDuration() }} hours</td></tr>
+                <tr><th>City</th><td>{{ $booking->city->city }}, {{ $booking->city->state }}</td></tr>
             </tbody>
         </table>
     </div>

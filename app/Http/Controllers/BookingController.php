@@ -2,10 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+
+use App\City;
+use App\Booking;
+use App\Cleaner;
+use App\Customer;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-use App\Booking;
+use App\Http\Requests\BookingStoreRequest;
+use App\Http\Requests\QuickBookingRequest;
+use App\Http\Requests\BookingUpdateRequest;
+
 use Illuminate\Http\Request;
 use Session;
 
@@ -18,7 +27,7 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $booking = Booking::paginate(25);
+        $booking = Booking::with('customer', 'cleaner', 'city')->paginate(25);
 
         return view('booking.index', compact('booking'));
     }
@@ -30,22 +39,23 @@ class BookingController extends Controller
      */
     public function create()
     {
-        return view('booking.create');
+        $customers = (new Customer)->getList();
+        $cleaners = (new Cleaner)->getList();
+        $cities = (new City)->getList();
+
+        return view('booking.create', compact('customers', 'cleaners', 'cities'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\BookingStoreRequest $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function store(Request $request)
+    public function store(BookingStoreRequest $request)
     {
-        
-        $requestData = $request->all();
-        
-        Booking::create($requestData);
+        Booking::create($request->validated());
 
         Session::flash('flash_message', 'Booking added!');
 
@@ -84,19 +94,16 @@ class BookingController extends Controller
      * Update the specified resource in storage.
      *
      * @param  int  $id
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\BookingUpdateRequest $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function update($id, Request $request)
+    public function update($id, BookingUpdateRequest $request)
     {
-        
-        $requestData = $request->all();
-        
         $booking = Booking::findOrFail($id);
-        $booking->update($requestData);
-
-        Session::flash('flash_message', 'Booking updated!');
+        if ($booking->update($request->validated())) {
+            Session::flash('flash_message', 'Booking updated!');
+        }
 
         return redirect('booking');
     }
@@ -110,10 +117,26 @@ class BookingController extends Controller
      */
     public function destroy($id)
     {
-        Booking::destroy($id);
-
-        Session::flash('flash_message', 'Booking deleted!');
+        if (Booking::destroy($id)) {
+            Session::flash('flash_message', 'Booking deleted!');
+        }
 
         return redirect('booking');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \App\Http\Requests\QuickBookingRequest $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function quickBooking(QuickBookingRequest $request)
+    {
+        // Booking::create($request->validated());
+
+        Session::flash('flash_message', 'Booking added!');
+
+        return back(200);
     }
 }

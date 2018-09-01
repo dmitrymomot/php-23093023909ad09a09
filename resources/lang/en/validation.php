@@ -114,4 +114,9 @@ return [
 
     'attributes' => [],
 
+    'is_customer_available' => 'This customer is not available at requested time',
+    'is_cleaner_available' => 'This cleaner is not available at requested time',
+    'phone_number' => 'Phone number must be in international format, e.g.: +1-555-555-5555',
+    'unique_phone_number' => 'This phone number is taken'
+
 ];

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
 
-    <h1>Edit Customer {{ $customer->id }}</h1>
+    <h1>Edit Customer #{{ $customer->id }}</h1>
 
     {!! Form::model($customer, [
         'method' => 'PATCH',
